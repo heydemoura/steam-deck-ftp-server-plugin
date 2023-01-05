@@ -11,7 +11,7 @@ import {
   showContextMenu,
   staticClasses,
 } from "decky-frontend-lib";
-import { VFC } from "react";
+import { VFC, useCallback, useState } from "react";
 import { FaShip } from "react-icons/fa";
 
 import logo from "../assets/logo.png";
@@ -21,8 +21,9 @@ import logo from "../assets/logo.png";
 //   right: number;
 // }
 
-const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
-  // const [result, setResult] = useState<number | undefined>();
+const Content: VFC<{ serverAPI: ServerAPI }> = ({ serverAPI }) => {
+  const [result, setResult] = useState<any>();
+  const [serverRunning, setServerRunning] = useState<boolean>(false);
 
   // const onClick = async () => {
   //   const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
@@ -37,30 +38,29 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
   //   }
   // };
 
+  const onServerStartClick = useCallback(async () => {
+    const serverMethod = serverRunning ? "stop" : "start";
+    try {
+      const response = await serverAPI.callPluginMethod(serverMethod, {});
+      if (response.success) {
+        setServerRunning(serverMethod === "start");
+      }
+      setResult(response.result);
+    } catch (e) {
+      setResult(e);
+    }
+  }, [serverRunning]);
+
   return (
     <PanelSection title="Panel Section">
       <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={(e) =>
-            showContextMenu(
-              <Menu label="Menu" cancelText="CAAAANCEL" onCancel={() => {}}>
-                <MenuItem onSelected={() => {}}>Item #1</MenuItem>
-                <MenuItem onSelected={() => {}}>Item #2</MenuItem>
-                <MenuItem onSelected={() => {}}>Item #3</MenuItem>
-              </Menu>,
-              e.currentTarget ?? window
-            )
-          }
-        >
-          Server says yolo
+        <ButtonItem layout="below" onClick={onServerStartClick}>
+          {serverRunning ? "Stop server" : "Start server"}
         </ButtonItem>
       </PanelSectionRow>
 
       <PanelSectionRow>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img src={logo} />
-        </div>
+        <p>{result}</p>
       </PanelSectionRow>
 
       <PanelSectionRow>
@@ -68,7 +68,7 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
           layout="below"
           onClick={() => {
             Router.CloseSideMenus();
-            Router.Navigate("/decky-plugin-test");
+            Router.Navigate("/ftp-server");
           }}
         >
           Router
@@ -81,7 +81,7 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
 const DeckyPluginRouterTest: VFC = () => {
   return (
     <div style={{ marginTop: "50px", color: "white" }}>
-      Hello World!
+      FTP Server
       <DialogButton onClick={() => Router.NavigateToStore()}>
         Go to Store
       </DialogButton>
@@ -90,7 +90,7 @@ const DeckyPluginRouterTest: VFC = () => {
 };
 
 export default definePlugin((serverApi: ServerAPI) => {
-  serverApi.routerHook.addRoute("/decky-plugin-test", DeckyPluginRouterTest, {
+  serverApi.routerHook.addRoute("/ftp-server", DeckyPluginRouterTest, {
     exact: true,
   });
 
