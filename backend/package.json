@@ -1,0 +1,18 @@
+{
+  "name": "steam-deck-ftp-server-backend",
+  "version": "1.0.0",
+  "description": "Steam Deck FTP Server Plugin Backend",
+  "main": "index.js",
+  "scripts": {
+    "package": "npx pkg -t node16-linux-x64 ./src/index.js -o ./out/server",
+    "package-macos": "npx pkg -t node16-macos-arm64 ./src/index.js -o ./out/server-macos",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ftp-srv": "^4.6.2"
+  },
+  "devDependencies": {
+   }
+}

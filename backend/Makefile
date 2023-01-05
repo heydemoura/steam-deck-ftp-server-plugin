@@ -1,14 +1,14 @@
 # This is the default target, which will be built when 
 # you invoke make
-.PHONY: all
-all: hello
-
-# This rule tells make how to build hello from hello.cpp
-hello:
-	mkdir -p ./out
-	gcc -o ./out/hello ./src/main.c 
+.PHONY: build
+build:
+	pnpm install
+	pnpm run package
+	mkdir -p ../bin
+	mv ./out/server ../bin/server
 
 # This rule tells make to delete hello and hello.o
 .PHONY: clean 
 clean:
-	rm -f hello
+	rm -f ./out/bundle.js
+	rm -f ./out/server
